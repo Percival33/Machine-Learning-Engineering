@@ -1,30 +1,32 @@
-# -*- coding: utf-8 -*-
-import click
-import logging
-from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+import pandas as pd
+import os
 
-
-@click.command()
-@click.argument("input_filepath", type=click.Path(exists=True))
-@click.argument("output_filepath", type=click.Path())
-def main(input_filepath, output_filepath):
-    """Runs data processing scripts to turn raw data from (../raw) into
-    cleaned data ready to be analyzed (saved in ../processed).
-    """
-    logger = logging.getLogger(__name__)
-    logger.info("making final data set from raw data")
-
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "data")
+OUTPUT_FOLDER = f"{DATA_DIR}/processed"
 
 if __name__ == "__main__":
-    log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    logging.basicConfig(level=logging.INFO, format=log_fmt)
+    tracks_df = pd.read_json(os.path.join(DATA_DIR, "raw", "05_02_v2", "tracks.jsonl"), lines=True)
+    artists_df = pd.read_json(
+        os.path.join(DATA_DIR, "raw", "05_02_v2", "artists.jsonl"), lines=True
+    )
 
-    # not used in this stub but often useful for finding various files
-    project_dir = Path(__file__).resolve().parents[2]
+    tracks_genre_df = tracks_df.merge(
+        artists_df[["id", "genres"]], left_on="id_artist", right_on="id", how="inner"
+    )
+    exploded_genres = tracks_genre_df[["id_x", "genres"]].explode("genres").reset_index()
+    exploded_genres = exploded_genres.rename(columns={"id_x": "track_id", "genres": "genre"})
+    exploded_genres.drop(columns=["index"])
 
-    # find .env automagically by walking up directories until it's found, then
-    # load up the .env entries as environment variables
-    load_dotenv(find_dotenv())
+    exploded_genres.to_json(
+        os.path.join(OUTPUT_FOLDER, "exploded_genres.jsonl"), orient="records", lines=True
+    )
 
-    main()
+    exploded_genres_with_popularity = exploded_genres.drop(columns="index").merge(
+        tracks_df[["id", "popularity"]], left_on="track_id", right_on="id"
+    )
+    exploded_genres_with_popularity.drop(columns="id").to_json(
+        os.path.join(OUTPUT_FOLDER, "exploded_genres_with_popularity.jsonl"),
+        orient="records",
+        lines=True,
+    )
+    print(f"dataset saved to a folder: {OUTPUT_FOLDER}")
