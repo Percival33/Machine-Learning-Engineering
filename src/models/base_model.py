@@ -41,7 +41,7 @@ class BaseModel(AbstractSolver):
         genres = defaultdict(lambda: Playlist(track_limit))
         for _, row in X.iterrows():
             track_id, genre, popularity = row
-            genres[genre].add(Track(track_id, popularity))
+            genres[genre].add(Track(track_id, popularity, -1))
         return genres
 
     def predict(self, X):
@@ -61,16 +61,13 @@ if __name__ == "__main__":
     unique_songs = set()
 
     for genre, playlist in res.items():
-        print(f"Genre: {genre}")
+        print(f"  Genre: {genre}")
         print(f"  Size: {playlist.size}")
         print(f"  Sum: {playlist.sum}")
         print(f"  Min Popularity: {playlist.min}")
         print(f"  Max Popularity: {playlist.max}")
         print(f"  Mean Popularity: {playlist.mean:.2f}")
-        # print(f"  Playlist: {playlist}")
         print("-" * 30)
 
-        for track in playlist.tracks:
-            unique_songs.add(track)
-
-    print(len(unique_songs))
+        # for track in playlist.tracks:
+        #     unique_songs.add(track)

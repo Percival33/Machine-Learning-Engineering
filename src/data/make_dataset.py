@@ -6,6 +6,27 @@ OUTPUT_FOLDER = f"{DATA_DIR}/processed"
 
 if __name__ == "__main__":
     tracks_df = pd.read_json(os.path.join(DATA_DIR, "raw", "05_02_v2", "tracks.jsonl"), lines=True)
+
+    # the following is done because some of the songs have identical statistics
+    # they interfere in the generating process, but also there are only like 50 of them, so we just cut them out
+    tracks_df = tracks_df.drop_duplicates(keep="first", subset=["popularity",
+                                                                "danceability",
+                                                                "energy",
+                                                                "key",
+                                                                "loudness",
+                                                                "speechiness",
+                                                                "acousticness",
+                                                                "instrumentalness",
+                                                                "liveness",
+                                                                "valence",
+                                                                "tempo"])
+
+    tracks_df.to_json(
+        os.path.join(OUTPUT_FOLDER, "tracks_no_duplicates.jsonl"),
+        orient="records",
+        lines=True,
+    )
+
     artists_df = pd.read_json(
         os.path.join(DATA_DIR, "raw", "05_02_v2", "artists.jsonl"), lines=True
     )
@@ -34,6 +55,7 @@ if __name__ == "__main__":
     exploded_genres_with_stats = exploded_genres.drop(columns="index").merge(
         tracks_df[
             ["id",
+             "popularity",
              "danceability",
              "energy",
              "key",
