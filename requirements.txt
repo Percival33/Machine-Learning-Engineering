@@ -6,6 +6,7 @@ jupyter
 notebook
 scipy
 seaborn
+scikit-learn
 
 # --------- others --------- #
 pre-commit      # hooks for applying linters on commit

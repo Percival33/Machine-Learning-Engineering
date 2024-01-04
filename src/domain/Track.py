@@ -5,3 +5,4 @@ from dataclasses import dataclass
 class Track:
     track_id: str
     popularity: int
+    group : int
