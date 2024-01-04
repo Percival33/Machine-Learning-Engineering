@@ -7,6 +7,8 @@ notebook
 scipy
 seaborn
 scikit-learn
+fastapi
+uvicorn
 
 # --------- others --------- #
 pre-commit      # hooks for applying linters on commit

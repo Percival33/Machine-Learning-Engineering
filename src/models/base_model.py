@@ -1,3 +1,5 @@
+import json
+import sys
 from collections import defaultdict
 
 import pandas as pd
@@ -13,16 +15,16 @@ DATA_PATH = os.path.abspath(
 
 
 class BaseModel(AbstractSolver):
-    def __init__(self, parameters=None):
+    def __init__(self, songs_in_genre=500, track_limit_per_playlist=10, number_of_playlists=5):
         """
         Initialize BaseModel with parameters.
-        Default parameters: {'songs_in_genre': 500, 'playlist_limit': 20}.
+        Default parameters: {'songs_in_genre': 500, 'playlist_limit': 10, 'number_of_playlists': 5}.
         """
-        self.parameters = (
-            parameters
-            if parameters
-            else {"songs_in_genre": 500, "track_limit_per_playlist": 20, "number_of_playlists": 5}
-        )
+        self.parameters = {
+            "songs_in_genre": songs_in_genre,
+            "track_limit_per_playlist": track_limit_per_playlist,
+            "number_of_playlists": number_of_playlists,
+        }
 
     def fit(self, X, y) -> None:
         pass
@@ -55,19 +57,44 @@ class BaseModel(AbstractSolver):
 
 
 if __name__ == "__main__":
-    data = pd.read_json(DATA_PATH, lines=True)
-    model = BaseModel()
-    res = model.predict(data)
-    unique_songs = set()
+    try:
+        data = pd.read_json(DATA_PATH, lines=True)
 
-    for genre, playlist in res.items():
-        print(f"  Genre: {genre}")
-        print(f"  Size: {playlist.size}")
-        print(f"  Sum: {playlist.sum}")
-        print(f"  Min Popularity: {playlist.min}")
-        print(f"  Max Popularity: {playlist.max}")
-        print(f"  Mean Popularity: {playlist.mean:.2f}")
-        print("-" * 30)
+        track_limit = 10
+        if len(sys.argv) > 1:
+            try:
+                track_limit = int(sys.argv[1])
+            except ValueError:
+                print("Warning: Invalid track limit provided. Using default value of 10.")
 
-        # for track in playlist.tracks:
-        #     unique_songs.add(track)
+        model = BaseModel(track_limit_per_playlist=track_limit)
+        res = model.predict(data)
+        unique_songs = set()
+
+        response = []
+        for genre, playlist in res.items():
+            response.append(
+                {
+                    # "genre": genre,
+                    "size": playlist.size,
+                    "min_track_popularity": playlist.min,
+                    "max_track_popularity": playlist.max,
+                    "mean_popularity": f"{playlist.mean:.2f}",
+                    "tracks": [track.to_json_serializable() for track in playlist.tracks],
+                }
+            )
+
+        print(json.dumps(response))
+    except Exception as e:
+        print(f"An error occurred: {e}")
+    # for genre, playlist in res.items():
+    #     print(f"  Genre: {genre}")
+    #     print(f"  Size: {playlist.size}")
+    #     print(f"  Sum: {playlist.sum}")
+    #     print(f"  Min Popularity: {playlist.min}")
+    #     print(f"  Max Popularity: {playlist.max}")
+    #     print(f"  Mean Popularity: {playlist.mean:.2f}")
+    #     print("-" * 30)
+
+    # for track in playlist.tracks:
+    #     unique_songs.add(track)

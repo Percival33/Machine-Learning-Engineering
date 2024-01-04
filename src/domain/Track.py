@@ -5,4 +5,7 @@ from dataclasses import dataclass
 class Track:
     track_id: str
     popularity: int
-    group : int
+    group: int
+
+    def to_json_serializable(self):
+        return self.track_id
