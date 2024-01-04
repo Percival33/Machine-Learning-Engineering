@@ -1,4 +1,5 @@
 import json
+import os
 from contextlib import asynccontextmanager
 from enum import Enum
 from fastapi import FastAPI, Query, Path, HTTPException
@@ -15,7 +16,8 @@ class ModelName(str, Enum):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    run(["python", "../data/make_dataset.py"])
+    dataset_path = os.path.join(os.path.dirname(__file__), "..", "data", "make_dataset.py")
+    run(["python", dataset_path])
     yield
 
 
@@ -32,9 +34,10 @@ async def predict_model(
     model_type: ModelName = Path(..., description="The model type"),
     tracks: int = Query(10, description="Number of tracks", ge=10, le=20),
 ):
+    model_path = os.path.join(os.path.dirname(__file__), "..", "models", f"{model_type}_model.py")
     try:
         result = run(
-            ["python", f"../models/{model_type}_model.py", str(tracks)],
+            ["python", model_path, str(tracks)],
             capture_output=True,
             text=True,
             check=True,

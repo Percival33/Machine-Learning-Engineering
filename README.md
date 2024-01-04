@@ -1,7 +1,9 @@
 machine learning engineering
 ==============================
 
-A short description of the project.
+Running Prediction Service
+------------
+Run `python src/infra/service.py` command and go to `http://0.0.0.0:8000/` to see documentation.
 
 Project Organization
 ------------
