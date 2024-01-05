@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from enum import Enum
 from fastapi import FastAPI, Query, Path, HTTPException
 import uvicorn
-from subprocess import run, CalledProcessError, STDOUT
+from subprocess import run, CalledProcessError
 
 from starlette.responses import RedirectResponse
 
@@ -14,10 +14,18 @@ class ModelName(str, Enum):
     advanced = "advanced"
 
 
+env = None
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     dataset_path = os.path.join(os.path.dirname(__file__), "..", "data", "make_dataset.py")
     run(["python", dataset_path])
+    print(os.getcwd())
+    global env
+    env = os.environ.copy()
+    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    env["PYTHONPATH"] = f'{root_dir}:{os.path.join(root_dir, "src")}'
     yield
 
 
@@ -35,13 +43,14 @@ async def predict_model(
     tracks: int = Query(10, description="Number of tracks", ge=10, le=20),
 ):
     model_path = os.path.join(os.path.dirname(__file__), "..", "models", f"{model_type}_model.py")
-    print(model_path)
+    print(model_path, env)
     try:
         result = run(
             ["python", model_path, str(tracks)],
             capture_output=True,
             text=True,
             check=True,
+            env=env,
         )
     except CalledProcessError as e:
         print(e.output, e.stderr, e.stdout)

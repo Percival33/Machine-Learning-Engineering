@@ -138,11 +138,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         print(f"An error occurred: {e}")
-
-    # for playlist in playlists:
-    #     print(f"  Size: {playlist.size}")
-    #     print(f"  Sum: {playlist.sum}")
-    #     print(f"  Min Popularity: {playlist.min}")
-    #     print(f"  Max Popularity: {playlist.max}")
-    #     print(f"  Mean Popularity: {playlist.mean:.2f}")
-    #     print("-" * 30)
