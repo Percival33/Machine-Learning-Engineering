@@ -42,7 +42,9 @@ async def predict_model(
     model_type: ModelName = Path(..., description="The model type"),
     tracks: int = Query(10, description="Number of tracks", ge=10, le=20),
 ):
-    model_path = os.path.join(os.path.dirname(__file__), "..", "models", f"{model_type}_model.py")
+    model_path = os.path.join(
+        os.path.dirname(__file__), "..", "models", f"{model_type.value}_model.py"
+    )
     print(model_path, env)
     try:
         result = run(
