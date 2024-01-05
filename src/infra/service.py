@@ -35,6 +35,7 @@ async def predict_model(
     tracks: int = Query(10, description="Number of tracks", ge=10, le=20),
 ):
     model_path = os.path.join(os.path.dirname(__file__), "..", "models", f"{model_type}_model.py")
+    print(model_path)
     try:
         result = run(
             ["python", model_path, str(tracks)],
@@ -43,6 +44,7 @@ async def predict_model(
             check=True,
         )
     except CalledProcessError as e:
+        print(e.output, e.stderr, e.stdout)
         raise HTTPException(status_code=500, detail=f"Model script execution failed: {e.output}")
     except FileNotFoundError:
         raise HTTPException(status_code=404, detail="Invalid model type")
