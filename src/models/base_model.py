@@ -59,7 +59,6 @@ class BaseModel(AbstractSolver):
 if __name__ == "__main__":
     try:
         data = pd.read_json(DATA_PATH, lines=True)
-
         track_limit = 10
         if len(sys.argv) > 1:
             try:
@@ -75,7 +74,6 @@ if __name__ == "__main__":
         for genre, playlist in res.items():
             response.append(
                 {
-                    # "genre": genre,
                     "size": playlist.size,
                     "min_track_popularity": playlist.min,
                     "max_track_popularity": playlist.max,
@@ -86,15 +84,5 @@ if __name__ == "__main__":
 
         print(json.dumps(response))
     except Exception as e:
+        print("dupa")
         print(f"An error occurred: {e}")
-    # for genre, playlist in res.items():
-    #     print(f"  Genre: {genre}")
-    #     print(f"  Size: {playlist.size}")
-    #     print(f"  Sum: {playlist.sum}")
-    #     print(f"  Min Popularity: {playlist.min}")
-    #     print(f"  Max Popularity: {playlist.max}")
-    #     print(f"  Mean Popularity: {playlist.mean:.2f}")
-    #     print("-" * 30)
-
-    # for track in playlist.tracks:
-    #     unique_songs.add(track)
