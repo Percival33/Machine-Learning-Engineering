@@ -1,14 +1,12 @@
 import json
-import os
-from contextlib import asynccontextmanager
+import subprocess
 from enum import Enum
 from subprocess import CalledProcessError
 
-from fastapi import FastAPI, Query, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, Depends
 import uvicorn
 from starlette.responses import RedirectResponse
 from config import settings
-from db import db
 from lifespan import lifespan
 from runner import run_model
 
@@ -18,9 +16,25 @@ class ModelName(str, Enum):
     ADVANCED = "advanced"
 
 
-env = None
-
 app = FastAPI(lifespan=lifespan)
+
+
+async def run_model_dependency(model_type: ModelName):
+    try:
+        output = await run_model(model_type, settings.TRACKS_NO)
+        if output.stderr:
+            raise HTTPException(status_code=500, detail=f"Error in model: {output.stderr}")
+        return output
+    except CalledProcessError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except FileNotFoundError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+async def run_model_for_user(user_id: int):
+    model_type = ModelName.ADVANCED if user_id % 2 else ModelName.BASE
+    # print(model_type)
+    return await run_model_dependency(model_type)
 
 
 @app.get("/", include_in_schema=False)
@@ -31,36 +45,15 @@ async def index():
 @app.get("/predict/model/{model_type}")
 async def predict_model(
     model_type: ModelName = Path(..., description="The model type"),
+    output: subprocess.CompletedProcess = Depends(run_model_dependency),
 ):
-    try:
-        output = run_model(model_type, settings.TRACKS_NO)
-    except CalledProcessError:
-        raise HTTPException(status_code=500, detail=output)
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail=output)
-
-    if output.stderr:
-        raise HTTPException(status_code=500, detail=f"Error in model: {output.stderr}")
-
     return {"model_type": model_type, "playlists": json.loads(output.stdout)}
 
 
-@app.get("/next-playlist/{user_id}")
-async def playlist(user_id: int):
-    model = ModelName.ADVANCED if user_id % 2 else ModelName.BASE
-
-    print(f"Used model: {model}")
-
-    try:
-        output = run_model(model, settings.TRACKS_NO)
-    except CalledProcessError:
-        raise HTTPException(status_code=500, detail=output)
-    except FileNotFoundError:
-        raise HTTPException(status_code=404, detail=output)
-
-    if output.stderr:
-        raise HTTPException(status_code=500, detail=f"Error in model: {output.stderr}")
-
+@app.get("/playlists/{user_id}")
+async def playlist(
+    user_id: int, output: subprocess.CompletedProcess = Depends(run_model_for_user)
+):
     return {"playlist": json.loads(output.stdout)}
 
 

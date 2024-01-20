@@ -9,7 +9,7 @@ def get_env():
     return env
 
 
-def run_model(model: str, track_no: int, env=None):
+async def run_model(model: str, track_no: int, env=None):
     model_path = os.path.join(os.path.dirname(__file__), "..", "models", f"{model.value}_model.py")
     try:
         env = env if env is not None else get_env()
@@ -24,5 +24,5 @@ def run_model(model: str, track_no: int, env=None):
         print(e.output, e.stderr, e.stdout)
         raise CalledProcessError(f"Model execution failed: {e.output}")
     except FileNotFoundError as e:
-        raise FileNotFoundError(f"Invalid model: {e.output}")
+        raise FileNotFoundError(f"Invalid model. {model} not found.")
     return result

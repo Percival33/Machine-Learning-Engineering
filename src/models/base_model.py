@@ -1,6 +1,7 @@
 import json
 import sys
 from collections import defaultdict
+from io import StringIO
 
 import pandas as pd
 import os
@@ -9,8 +10,10 @@ from src.domain.Playlist import Playlist
 from src.domain.Track import Track
 from src.models.ABCSolver import AbstractSolver
 
-DATA_PATH = os.path.abspath(
-    os.path.join(".", "..", "..", "data", "processed", "exploded_genres_with_popularity.jsonl")
+DATA_PATH = "file://" + os.path.abspath(
+    os.path.join(
+        __file__, "..", "..", "..", "data", "processed", "exploded_genres_with_popularity.jsonl"
+    )
 )
 
 

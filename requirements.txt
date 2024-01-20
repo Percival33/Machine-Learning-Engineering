@@ -17,3 +17,4 @@ pytest==7.4.3
 starlette==0.32.0.post1
 setuptools==68.2.2
 pydantic_settings==2.1.0
+httpx==0.26.0
