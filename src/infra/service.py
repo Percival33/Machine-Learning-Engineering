@@ -2,32 +2,23 @@ import json
 import os
 from contextlib import asynccontextmanager
 from enum import Enum
+from subprocess import CalledProcessError
+
 from fastapi import FastAPI, Query, Path, HTTPException
 import uvicorn
-from subprocess import run, CalledProcessError
-
 from starlette.responses import RedirectResponse
+from config import settings
+from db import db
+from lifespan import lifespan
+from runner import run_model
 
 
 class ModelName(str, Enum):
-    base = "base"
-    advanced = "advanced"
+    BASE = "base"
+    ADVANCED = "advanced"
 
 
 env = None
-
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    dataset_path = os.path.join(os.path.dirname(__file__), "..", "data", "make_dataset.py")
-    run(["python", dataset_path])
-    print(os.getcwd())
-    global env
-    env = os.environ.copy()
-    root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    env["PYTHONPATH"] = f'{root_dir}:{os.path.join(root_dir, "src")}'
-    yield
-
 
 app = FastAPI(lifespan=lifespan)
 
@@ -40,31 +31,38 @@ async def index():
 @app.get("/predict/model/{model_type}")
 async def predict_model(
     model_type: ModelName = Path(..., description="The model type"),
-    tracks: int = Query(10, description="Number of tracks", ge=10, le=20),
 ):
-    model_path = os.path.join(
-        os.path.dirname(__file__), "..", "models", f"{model_type.value}_model.py"
-    )
-    print(model_path, env)
     try:
-        result = run(
-            ["python", model_path, str(tracks)],
-            capture_output=True,
-            text=True,
-            check=True,
-            env=env,
-        )
-    except CalledProcessError as e:
-        print(e.output, e.stderr, e.stdout)
-        raise HTTPException(status_code=500, detail=f"Model script execution failed: {e.output}")
+        output = run_model(model_type, settings.TRACKS_NO)
+    except CalledProcessError:
+        raise HTTPException(status_code=500, detail=output)
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="Invalid model type")
+        raise HTTPException(status_code=404, detail=output)
 
-    if result.stderr:
-        raise HTTPException(status_code=500, detail=f"Error in model: {result.stderr}")
+    if output.stderr:
+        raise HTTPException(status_code=500, detail=f"Error in model: {output.stderr}")
 
-    return {"model_type": model_type, "playlists": json.loads(result.stdout)}
+    return {"model_type": model_type, "playlists": json.loads(output.stdout)}
+
+
+@app.get("/next-playlist/{user_id}")
+async def playlist(user_id: int):
+    model = ModelName.ADVANCED if user_id % 2 else ModelName.BASE
+
+    print(f"Used model: {model}")
+
+    try:
+        output = run_model(model, settings.TRACKS_NO)
+    except CalledProcessError:
+        raise HTTPException(status_code=500, detail=output)
+    except FileNotFoundError:
+        raise HTTPException(status_code=404, detail=output)
+
+    if output.stderr:
+        raise HTTPException(status_code=500, detail=f"Error in model: {output.stderr}")
+
+    return {"playlist": json.loads(output.stdout)}
 
 
 if __name__ == "__main__":
-    uvicorn.run("service:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("service:app", host=settings.HOST, port=settings.PORT, reload=settings.DEBUG_MODE)

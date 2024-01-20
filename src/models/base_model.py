@@ -84,5 +84,4 @@ if __name__ == "__main__":
 
         print(json.dumps(response))
     except Exception as e:
-        print("dupa")
         print(f"An error occurred: {e}")
