@@ -10,18 +10,14 @@ from src.domain.Playlist import Playlist
 from src.domain.Track import Track
 from src.models.ABCSolver import AbstractSolver
 
-STATS_PATH = os.path.abspath(
-    os.path.join(".", "..", "..", "data", "processed", "exploded_genres_with_stats.jsonl")
-)
-
-CORRECTED_STATS_PATH = os.path.abspath(
+STATS_PATH = "file://" + os.path.abspath(
     os.path.join(
-        ".", "..", "..", "data", "processed", "exploded_genres_corrected_with_stats.jsonl"
+        __file__, "..", "..", "..", "data", "processed", "exploded_genres_with_stats.jsonl"
     )
 )
 
-TRACKS_PATH = os.path.abspath(
-    os.path.join(".", "..", "..", "data", "processed", "tracks_no_duplicates.jsonl")
+TRACKS_PATH = "file://" + os.path.abspath(
+    os.path.join(__file__, "..", "..", "..", "data", "processed", "tracks_no_duplicates.jsonl")
 )
 
 
