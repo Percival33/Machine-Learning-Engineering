@@ -23,6 +23,6 @@ async def run_model(model: str, track_no: int, env=None):
     except CalledProcessError as e:
         print(e.output, e.stderr, e.stdout)
         raise CalledProcessError(f"Model execution failed: {e.output}")
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         raise FileNotFoundError(f"Invalid model. {model} not found.")
     return result

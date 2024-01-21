@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import SettingsConfigDict, BaseSettings
 
 
 class CommonSettings(BaseSettings):
@@ -21,8 +21,7 @@ class TracksSettings(BaseSettings):
 
 
 class Settings(CommonSettings, ServerSettings, DatabaseSettings, TracksSettings):
-    class Config:
-        env_file = ".env", ".env.prod"
+    model_config = SettingsConfigDict(env_file=".env")
 
 
 settings = Settings()

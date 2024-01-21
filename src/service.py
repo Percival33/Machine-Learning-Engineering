@@ -6,9 +6,9 @@ from subprocess import CalledProcessError
 from fastapi import FastAPI, Path, HTTPException, Depends
 import uvicorn
 from starlette.responses import RedirectResponse
-from config import settings
-from lifespan import lifespan
-from runner import run_model
+from infra.config import settings
+from infra.lifespan import lifespan
+from infra.runner import run_model
 
 
 class ModelName(str, Enum):
@@ -54,7 +54,7 @@ async def predict_model(
 async def playlist(
     user_id: int, output: subprocess.CompletedProcess = Depends(run_model_for_user)
 ):
-    return {"playlist": json.loads(output.stdout)}
+    return {"playlists": json.loads(output.stdout)}
 
 
 if __name__ == "__main__":
