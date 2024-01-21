@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from service import app, run_model_dependency, run_model_for_user
+from src.service import app, run_model_dependency, run_model_for_user
 import mocks
 
 client = TestClient(app)

@@ -4,6 +4,7 @@ import random
 import sys
 
 import pandas as pd
+from pandas import DataFrame
 from sklearn.cluster import KMeans
 
 from src.domain.Playlist import Playlist
@@ -41,16 +42,27 @@ class AdvancedModel(AbstractSolver):
     def fit(self, X, y) -> None:
         pass
 
-    def get_parameters(self):
+    def get_parameters(self) -> dict[str, int]:
         return self.parameters
 
     @staticmethod
-    def validate_data(X):
-        required_columns = {"track_id", "genre", "popularity"}
+    def validate_data(X: DataFrame) -> None:
+        required_columns = {"popularity",
+                            "danceability",
+                            "energy",
+                            "key",
+                            "loudness",
+                            "speechiness",
+                            "acousticness",
+                            "instrumentalness",
+                            "liveness",
+                            "valence",
+                            "tempo"}
         if not required_columns.issubset(X.columns):
             raise ValueError(f"Data must contain columns: {required_columns}")
 
-    def predict(self, X):
+    def predict(self, X: DataFrame) -> list[Playlist]:
+        self.validate_data(X)
         kmeans = KMeans(n_clusters=10, init="k-means++", n_init="auto")
         tracks_data = pd.read_json(TRACKS_PATH, lines=True)
 
@@ -66,7 +78,7 @@ class AdvancedModel(AbstractSolver):
         return self.make_playlists(sorted_tracks, best_groups)
 
     @staticmethod
-    def sort_tracks(tracks):
+    def sort_tracks(tracks: list[Track]) -> dict[int, list[Track]]:
         sorted_tracks = dict()
         for track in tracks:
             if track.group not in sorted_tracks:
@@ -75,7 +87,7 @@ class AdvancedModel(AbstractSolver):
         return sorted_tracks
 
     @staticmethod
-    def get_most_popular_groups(popularity, tracks):
+    def get_most_popular_groups(popularity: int, tracks: dict[int, list[Track]]) -> set[int]:
         best_groups = set()
         for group, grouped_track in tracks.items():
             for track in grouped_track:
@@ -83,7 +95,7 @@ class AdvancedModel(AbstractSolver):
                     best_groups.add(group)
         return best_groups
 
-    def make_playlists(self, tracks, groups):
+    def make_playlists(self, tracks: dict[int, list[Track]], groups: set[int]) -> list[Playlist]:
         playlists = list()
         i = 0
         for group in groups:
@@ -93,7 +105,7 @@ class AdvancedModel(AbstractSolver):
             random_tracks = random.sample(
                 tracks[group], self.parameters["track_limit_per_playlist"]
             )
-            for track in random_tracks:
+            for track in sorted(random_tracks, key=lambda x: x.popularity):
                 new_playlist.add(track)
             playlists.append(new_playlist)
             i += 1
