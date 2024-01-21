@@ -1,5 +1,12 @@
 from dataclasses import dataclass, field
 from src.domain.Track import Track
+import os
+import pandas as pd
+
+
+TRACKS_PATH = "file://" + os.path.abspath(
+    os.path.join(__file__, "..", "..", "..", "data", "processed", "track_user_stats.jsonl")
+)
 
 
 @dataclass
@@ -48,3 +55,12 @@ class Playlist:
         self.max = max(self.max, current_track.popularity)
         self.mean = self.sum / self.size
         self.limit()
+
+    def get_retention(self):
+        tracks_user_data = pd.read_json(TRACKS_PATH, lines=True)
+        overall_retention = 0
+        for track in self.tracks:
+            specific_track = tracks_user_data[tracks_user_data['track_id'] == track.track_id]
+            rows = specific_track.shape[0]
+            overall_retention += specific_track['percentage_played'].sum() / rows
+        return overall_retention / len(self.tracks)

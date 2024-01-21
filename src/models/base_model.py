@@ -51,7 +51,7 @@ class BaseModel(AbstractSolver):
             genres[genre].add(Track(track_id, popularity, -1))
         return genres
 
-    def predict(self, X: DataFrame) -> dict[str, list[Playlist]]:
+    def predict(self, X: DataFrame) -> dict[str, Playlist]:
         self.validate_data(X)
         X = X.sort_values(by="popularity", ascending=False)
         genres = self.create_playlists(X)
