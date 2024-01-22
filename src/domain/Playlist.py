@@ -60,7 +60,7 @@ class Playlist:
         tracks_user_data = pd.read_json(TRACKS_PATH, lines=True)
         overall_retention = 0
         for track in self.tracks:
-            specific_track = tracks_user_data[tracks_user_data['track_id'] == track.track_id]
+            specific_track = tracks_user_data[tracks_user_data["track_id"] == track.track_id]
             rows = specific_track.shape[0]
-            overall_retention += specific_track['percentage_played'].sum() / rows
+            overall_retention += specific_track["percentage_played"].sum() / rows
         return overall_retention / len(self.tracks)

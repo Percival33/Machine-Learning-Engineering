@@ -47,17 +47,19 @@ class AdvancedModel(AbstractSolver):
 
     @staticmethod
     def validate_data(X: DataFrame) -> None:
-        required_columns = {"popularity",
-                            "danceability",
-                            "energy",
-                            "key",
-                            "loudness",
-                            "speechiness",
-                            "acousticness",
-                            "instrumentalness",
-                            "liveness",
-                            "valence",
-                            "tempo"}
+        required_columns = {
+            "popularity",
+            "danceability",
+            "energy",
+            "key",
+            "loudness",
+            "speechiness",
+            "acousticness",
+            "instrumentalness",
+            "liveness",
+            "valence",
+            "tempo",
+        }
         if not required_columns.issubset(X.columns):
             raise ValueError(f"Data must contain columns: {required_columns}")
 

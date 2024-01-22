@@ -11,14 +11,14 @@ def agg_events(x):
 
 
 def track_stats_per_user(tracks_df: DataFrame):
-    session_df = pd.read_json(os.path.join(DATA_DIR, "raw", "05_02_v2", "sessions.jsonl"), lines=True)
-    tracks_tmp = tracks_df[["id", "duration_ms"]]
-    session_tmp = session_df.sort_values(
-        by=["session_id", "timestamp"], ascending=[True, True]
+    session_df = pd.read_json(
+        os.path.join(DATA_DIR, "raw", "05_02_v2", "sessions.jsonl"), lines=True
     )
+    tracks_tmp = tracks_df[["id", "duration_ms"]]
+    session_tmp = session_df.sort_values(by=["session_id", "timestamp"], ascending=[True, True])
 
     session_tmp["time_played"] = (
-            pd.to_datetime(session_tmp["timestamp"]).diff().dt.total_seconds() * 1000
+        pd.to_datetime(session_tmp["timestamp"]).diff().dt.total_seconds() * 1000
     )
     session_tmp["time_played"] = session_tmp["time_played"].shift(-1)
 
@@ -26,9 +26,7 @@ def track_stats_per_user(tracks_df: DataFrame):
         session_tmp.groupby(["track_id", "user_id"])["time_played"].agg("sum").reset_index()
     )
     grouped_events = (
-        session_tmp.groupby(["track_id", "user_id"])["event_type"]
-        .agg([agg_events])
-        .reset_index()
+        session_tmp.groupby(["track_id", "user_id"])["event_type"].agg([agg_events]).reset_index()
     )
 
     track_user_stats = pd.merge(
@@ -39,7 +37,7 @@ def track_stats_per_user(tracks_df: DataFrame):
     )
 
     track_user_stats["percentage_played"] = (
-            track_user_stats["time_played"] / track_user_stats["duration_ms"] * 100
+        track_user_stats["time_played"] / track_user_stats["duration_ms"] * 100
     )
     track_user_stats["percentage_played"] = track_user_stats.apply(
         lambda row: 100.0 if row.percentage_played > 100 else row.percentage_played, axis=1
@@ -55,7 +53,7 @@ def track_stats_per_user(tracks_df: DataFrame):
     track_user_stats = track_user_stats.drop(
         track_user_stats[
             abs(track_user_stats.time_played) / 10 > track_user_stats.duration_ms
-            ].index
+        ].index
     )
     track_user_stats = track_user_stats.drop(
         track_user_stats[track_user_stats.time_played == 0.0].index
