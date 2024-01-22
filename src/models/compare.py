@@ -19,11 +19,11 @@ POPULARITY_PATH = "file://" + os.path.abspath(
 
 def get_model_results(playlists: list[Playlist]) -> dict[str, float]:
     results = {
-                "size": 0,
-                "min_track_popularity": 0,
-                "max_track_popularity": 0,
-                "mean_popularity": 0,
-                "retention": 0
+        "size": 0,
+        "min_track_popularity": 0,
+        "max_track_popularity": 0,
+        "mean_popularity": 0,
+        "retention": 0,
     }
 
     for playlist in playlists:
@@ -44,11 +44,11 @@ def get_model_results(playlists: list[Playlist]) -> dict[str, float]:
 
 def compress_dicts(dicts: list[dict[str, float]]) -> dict[str, float]:
     results = {
-                "size": 0,
-                "min_track_popularity": 0,
-                "max_track_popularity": 0,
-                "mean_popularity": 0,
-                "retention": 0
+        "size": 0,
+        "min_track_popularity": 0,
+        "max_track_popularity": 0,
+        "mean_popularity": 0,
+        "retention": 0,
     }
 
     for playlist in dicts:
@@ -70,9 +70,7 @@ def compress_dicts(dicts: list[dict[str, float]]) -> dict[str, float]:
 def compare():
     stats_data = pd.read_json(STATS_PATH, lines=True)
     popularity_data = pd.read_json(POPULARITY_PATH, lines=True)
-    corrected_data = stats_data.drop(columns=["track_id", "genre"]).drop_duplicates(
-        keep="first"
-    )
+    corrected_data = stats_data.drop(columns=["track_id", "genre"]).drop_duplicates(keep="first")
 
     track_limit = 10
     iterations = 10

@@ -6,21 +6,15 @@ from src.domain.Track import Track
 from src.domain.Playlist import Playlist
 
 TRACKS_SAMPLE_PATH = "file://" + os.path.abspath(
-    os.path.join(
-        __file__, "..", "..", "..", "data", "test", "tracks_sample.jsonl"
-    )
+    os.path.join(__file__, "..", "..", "..", "data", "test", "tracks_sample.jsonl")
 )
 
 STATS_SAMPLE_PATH = "file://" + os.path.abspath(
-    os.path.join(
-        __file__, "..", "..", "..", "data", "test", "genres_with_stats_sample.jsonl"
-    )
+    os.path.join(__file__, "..", "..", "..", "data", "test", "genres_with_stats_sample.jsonl")
 )
 
 POPULARITY_SAMPLE_PATH = "file://" + os.path.abspath(
-    os.path.join(
-        __file__, "..", "..", "..", "data", "test", "genres_with_popularity_sample.jsonl"
-    )
+    os.path.join(__file__, "..", "..", "..", "data", "test", "genres_with_popularity_sample.jsonl")
 )
 
 
@@ -48,9 +42,7 @@ async def run_model_error():
 
 def genres_with_stats_sample() -> DataFrame:
     stats_data = pd.read_json(STATS_SAMPLE_PATH, lines=True)
-    corrected_data = stats_data.drop(columns=["track_id", "genre"]).drop_duplicates(
-        keep="first"
-    )
+    corrected_data = stats_data.drop(columns=["track_id", "genre"]).drop_duplicates(keep="first")
     return corrected_data
 
 

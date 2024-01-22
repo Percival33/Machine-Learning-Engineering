@@ -1,5 +1,10 @@
 from src.models.advanced_model import AdvancedModel
-from src.test.mocks import tracks_sample, tracks_sample_sorted, genres_with_stats_sample, playlists_sample
+from src.test.mocks import (
+    tracks_sample,
+    tracks_sample_sorted,
+    genres_with_stats_sample,
+    playlists_sample,
+)
 
 
 def test_sort_tracks():
