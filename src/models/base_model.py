@@ -1,10 +1,12 @@
 import json
 import sys
 from collections import defaultdict
-from io import StringIO
+from typing import Any
 
 import pandas as pd
 import os
+
+from pandas import DataFrame
 
 from src.domain.Playlist import Playlist
 from src.domain.Track import Track
@@ -32,16 +34,16 @@ class BaseModel(AbstractSolver):
     def fit(self, X, y) -> None:
         pass
 
-    def get_parameters(self):
+    def get_parameters(self) -> dict[str, int]:
         return self.parameters
 
     @staticmethod
-    def validate_data(X):
+    def validate_data(X: DataFrame) -> None:
         required_columns = {"track_id", "genre", "popularity"}
         if not required_columns.issubset(X.columns):
             raise ValueError(f"Data must contain columns: {required_columns}")
 
-    def create_playlists(self, X):
+    def create_playlists(self, X: DataFrame) -> defaultdict[Any, Playlist]:
         track_limit = self.parameters["track_limit_per_playlist"]
         genres = defaultdict(lambda: Playlist(track_limit))
         for _, row in X.iterrows():
@@ -49,7 +51,7 @@ class BaseModel(AbstractSolver):
             genres[genre].add(Track(track_id, popularity, -1))
         return genres
 
-    def predict(self, X):
+    def predict(self, X: DataFrame) -> dict[str, Playlist]:
         self.validate_data(X)
         X = X.sort_values(by="popularity", ascending=False)
         genres = self.create_playlists(X)
