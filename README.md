@@ -29,7 +29,7 @@ Extend the "Pozytywka" service by generating popular playlists – sets of match
 - Define the business problem, modeling tasks, assumptions, and success criteria.
 - Analyze the provided data to assess sufficiency for task realization, identifying any gaps or requirements for additional data.
 
-Report available [here](https://github.com/Percival33/Machine-Learning-Engineering/blob/main/reports/JarczewskiMizak_05_wariant02_etap1.ipynb) (in Polish).
+Report available [here](https://github.com/Percival33/Machine-Learning-Engineering/blob/main/reports/JarczewskiMizak_05wariant02_etap1.ipynb) (in Polish).
 
 ### Stage 2
 
