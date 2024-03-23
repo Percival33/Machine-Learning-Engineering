@@ -29,7 +29,7 @@ Extend the "Pozytywka" service by generating popular playlists – sets of match
 - Define the business problem, modeling tasks, assumptions, and success criteria.
 - Analyze the provided data to assess sufficiency for task realization, identifying any gaps or requirements for additional data.
 
-Report available [here](./reports/JarczewskiMizak_05wariant02_etap1.ipynb) (in Polish).
+Report available [here](https://github.com/Percival33/Machine-Learning-Engineering/blob/main/reports/JarczewskiMizak_05_wariant02_etap1.ipynb) (in Polish).
 
 ### Stage 2
 
@@ -44,6 +44,6 @@ Report available [here](./reports/JarczewskiMizak_05wariant02_etap1.ipynb) (in P
 3. **Demonstration Materials:**
    - Provide materials showing the implementation is functional.
 
-Report available [here](./reports/JarczewskiMizak_05wariant02_etap2.ipynb) (in Polish).
+Report available [here](https://github.com/Percival33/Machine-Learning-Engineering/blob/main/reports/JarczewskiMizak_05_wariant02_etap2.ipynb) (in Polish).
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
